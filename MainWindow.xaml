@@ -1,0 +1,145 @@
+﻿<Window x:Class="RomSync.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:RomSync"
+        mc:Ignorable="d"
+        Title="RomSync" Height="450"
+        DataContext="{Binding RelativeSource={RelativeSource Self}}"
+        Width="575.524"
+        Icon="Resources/programicon.png">
+    
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition />
+            <ColumnDefinition Width="5"/>
+            <ColumnDefinition />
+        </Grid.ColumnDefinitions>
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="30" />
+            <RowDefinition />
+            <RowDefinition Height="30" />
+        </Grid.RowDefinitions>
+
+        <StackPanel Orientation="Horizontal"
+                    Grid.Column="0"
+                    Grid.Row="0"
+                    VerticalAlignment="Center">
+
+            <Label Content="Input Path: "
+                   VerticalAlignment="Center" />
+
+            <TextBox Name="InputPathTextBox"
+                     Text="{Binding InputFileDirectory}"
+                     VerticalAlignment="Center"
+                     Width="150"/>
+
+            <Button Name="SelectInputPathButton"
+                    VerticalAlignment="Center"
+                    Click="SelectInputPathButton_Click"
+                    Margin="5,0,0,0"
+                    Content="Select..." 
+                    Padding="5,0,5,0"/>
+
+        </StackPanel>
+
+        <ListView Name="InputRomsListView"
+                  MouseLeftButtonUp="InputRomsListView_MouseLeftButtonUp"
+                  ItemsSource="{Binding InputRoms}"
+                  Grid.Column="0"
+                  Grid.Row="1">
+
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <StackPanel Orientation="Horizontal">
+                        
+                        <Image Height="20"
+                               Width="20"
+                               Margin="0,0,10,0"
+                               Source="{Binding SyncStatusImage}" />
+
+                        <Image Height="20"
+                               Width="20" 
+                               Margin="0,0,10,0"
+                               Source="{Binding Icon}"/>
+
+                        <Label Content="{Binding FileInfo.Name}" />
+
+                    </StackPanel>
+                    
+                    
+                </DataTemplate>
+            </ListView.ItemTemplate>
+            
+        </ListView>
+
+        <StackPanel Orientation="Horizontal"
+                    Grid.Column="2"
+                    Grid.Row="0"
+                    VerticalAlignment="Center">
+
+            <Label Content="Output Path: "
+                   VerticalAlignment="Center" />
+
+            <TextBox Name="OutputPathTextBox"
+                     Text="{Binding OutputFileDirectory}"
+                     VerticalAlignment="Center"
+                     Width="140" />
+
+            <Button Name="SelectOutputPathButton"
+                    Click="SelectOutputPathButton_Click"
+                    VerticalAlignment="Center"
+                    Margin="5,0,0,0"
+                    Content="Select..."
+                    Padding="5,0,5,0" />
+
+        </StackPanel>
+
+        <ListView Name="OutputRomsListView"
+                  ItemsSource="{Binding OutputRoms}"
+                  Grid.Column="3"
+                  Grid.Row="1">
+
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    
+                    <StackPanel Orientation="Horizontal">
+
+                        <Image Height="20"
+                               Width="20"
+                               Margin="0,0,10,0"
+                               Source="{Binding SyncStatusImage}" />
+
+                        <Image Height="20"
+                               Width="20"
+                               Margin="0,0,10,0"
+                               Source="{Binding Icon}" />
+
+                        <Label Content="{Binding FileInfo.Name}" />
+
+                    </StackPanel>
+
+
+                </DataTemplate>
+            </ListView.ItemTemplate>
+
+        </ListView>
+
+        <Button Name="SyncSelectedButton"
+                Content="Sync Selected"
+                IsEnabled="False"
+                Click="SyncSelectedButton_Click"
+                Grid.Column="0"
+                Grid.Row="2" />
+
+        <Button Name="DeleteSelectedButton"
+                Content="Delete Selected"
+                Grid.Column="2"
+                Click="DeleteSelectedButton_Click"
+                Grid.Row="2" />
+
+    </Grid>
+    
+</Window>
