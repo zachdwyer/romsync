@@ -2,12 +2,57 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="clr-namespace:RomSync"
+             xmlns:system="clr-namespace:System;assembly=mscorlib"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="pack://application:,,,/ToastNotifications.Messages;component/Themes/Default.xaml" />
             </ResourceDictionary.MergedDictionaries>
+
+            <BitmapImage x:Key="SyncWaitingImage"
+                         UriSource="pack://application:,,,/Resources/waiting.png" />
+
+            <BitmapImage x:Key="SyncCompleteImage"
+                         UriSource="pack://application:,,,/Resources/greencheck.png" />
+
+            <DataTemplate x:Key="RomItemTemplate">
+
+                <StackPanel Orientation="Horizontal">
+
+                    <Image Name="SyncImage"
+                           Height="20"
+                           Width="20"
+                           Margin="0,0,10,0" />
+
+                    <Image Height="20"
+                           Width="20"
+                           Margin="0,0,10,0"
+                           Source="{Binding Icon}" />
+
+                    <Label Content="{Binding FileInfo.Name}" />
+
+                </StackPanel>
+
+                <DataTemplate.Triggers>
+
+                    <DataTrigger Binding="{Binding SyncStatus}"
+                                 Value="0">
+                        <Setter TargetName="SyncImage"
+                                Property="Source"
+                                Value="{StaticResource SyncWaitingImage}" />
+                    </DataTrigger>
+                    <DataTrigger Binding="{Binding SyncStatus}"
+                                 Value="1">
+                        <Setter TargetName="SyncImage"
+                                Property="Source"
+                                Value="{StaticResource SyncCompleteImage}" />
+                    </DataTrigger>
+
+                </DataTemplate.Triggers>
+
+            </DataTemplate>
+
         </ResourceDictionary>
     </Application.Resources>
 </Application>

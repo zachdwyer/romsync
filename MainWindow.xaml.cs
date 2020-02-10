@@ -24,6 +24,7 @@ using ToastNotifications.Lifetime;
 using ToastNotifications.Position;
 using Application = System.Windows.Application;
 using ToastNotifications.Messages;
+using ToastNotifications.Core;
 
 namespace RomSync
 {
@@ -43,7 +44,7 @@ namespace RomSync
         #region Variables
 
         // Toast notification
-        Notifier notifier = new Notifier(cfg =>
+        private Notifier notifier = new Notifier(cfg =>
         {
             // Window position
             cfg.PositionProvider = new WindowPositionProvider(
@@ -56,10 +57,20 @@ namespace RomSync
             cfg.LifetimeSupervisor = new TimeAndCountBasedLifetimeSupervisor(
                 notificationLifetime: TimeSpan.FromSeconds(2.5),
                 maximumNotificationCount: MaximumNotificationCount.FromCount(1));
+                
 
             // Dispatcher that deploys the notification
             cfg.Dispatcher = Application.Current.Dispatcher;
+
         });
+
+        private MessageOptions messageOptions = new MessageOptions
+        {
+            NotificationClickAction = n => // set the callback for notification click event
+            {
+                n.Close();
+            }
+        };
 
 
 
@@ -89,20 +100,35 @@ namespace RomSync
         public MainWindow()
         {
             // Initialize values
-            InputFileDirectory = "Z:\\ROMs\\vectrex";
-            OutputFileDirectory = "C:\\Users\\zakdw\\Desktop\\rom test";
+            InputFileDirectory = Properties.Settings.Default.InputPath; 
+            OutputFileDirectory = Properties.Settings.Default.OutputPath;
             InputRoms = new ObservableCollection<Rom>();
             OutputRoms = new ObservableCollection<Rom>();
             InitializeComponent();
 
-            populateRomList(InputFileDirectory, true);
-            populateRomList(OutputFileDirectory, false);
+            bool inputIsBlank = string.IsNullOrEmpty(InputFileDirectory);
+            bool outputIsBlank = string.IsNullOrEmpty(InputFileDirectory);
 
-            findMatchingRoms();
+            
 
+            // Directories aren't blank? Then load the roms.
+            if (!inputIsBlank)
+            {
+                populateRomList(InputFileDirectory, true);
+            }
+
+            if (!outputIsBlank)
+            {
+                populateRomList(OutputFileDirectory, false);
+            }
+
+            // Only run if both are true.
+            if (! inputIsBlank && ! outputIsBlank)
+            {
+                identifyMatchingRoms();
+            }
+                
         }
-
-        
 
         private void populateRomList(string directory, bool useInputRoms)
         {
@@ -133,8 +159,9 @@ namespace RomSync
             }
         }
 
-        private void findMatchingRoms()
+        private void identifyMatchingRoms()
         {
+            // Reset the sync status for both input and output roms - when you sync one rom, you have to update both sides.
             foreach (Rom r in InputRoms)
             {
                 r.SyncStatus = 0;
@@ -145,6 +172,7 @@ namespace RomSync
                 r.SyncStatus = 0;
             }
 
+            // Find input roms that match output roms
             IEnumerable<Rom> inputRomsMatchingOutputRoms = InputRoms.Intersect<Rom>(OutputRoms);
 
             foreach(Rom match in inputRomsMatchingOutputRoms)
@@ -152,6 +180,7 @@ namespace RomSync
                 match.SyncStatus = 1;
             }
 
+            // Find output roms that match input roms (remember - these two lists are separate.)
             IEnumerable<Rom> outputRomsMatchingInputRoms = OutputRoms.Intersect<Rom>(InputRoms);
 
             foreach (Rom match in outputRomsMatchingInputRoms)
@@ -170,8 +199,7 @@ namespace RomSync
             {
                 InputFileDirectory = folderBrowserDialog.SelectedPath;
                 populateRomList(InputFileDirectory, true);
-                populateRomList(OutputFileDirectory, false);
-                findMatchingRoms();
+                identifyMatchingRoms();
             }
         }
 
@@ -184,8 +212,7 @@ namespace RomSync
             {
                 OutputFileDirectory = folderBrowserDialog.SelectedPath;
                 populateRomList(OutputFileDirectory, false);
-                populateRomList(InputFileDirectory, true);
-                findMatchingRoms();
+                identifyMatchingRoms();
             }
         }
 
@@ -245,15 +272,15 @@ namespace RomSync
 
             if (errorcount < 1)
             {
-                notifier.ShowSuccess("Sync complete!");
+                notifier.ShowSuccess("Sync complete!", messageOptions);
             } else
             {
-                notifier.ShowWarning("Sync either partially complete or failed.");
+                notifier.ShowWarning("Sync either partially complete or failed.", messageOptions);
             }
 
             populateRomList(OutputFileDirectory, false);
             populateRomList(InputFileDirectory, true);
-            findMatchingRoms();
+            identifyMatchingRoms();
 
         }
 
@@ -300,8 +327,16 @@ namespace RomSync
                 }
                 populateRomList(OutputFileDirectory, false);
                 populateRomList(InputFileDirectory, true);
-                findMatchingRoms();
+                identifyMatchingRoms();
             }
+        }
+
+        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            // Save paths before exit
+            Properties.Settings.Default.InputPath = InputFileDirectory;
+            Properties.Settings.Default.OutputPath = OutputFileDirectory;
+            Properties.Settings.Default.Save();
         }
     }
 }

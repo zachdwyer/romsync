@@ -7,6 +7,7 @@
         mc:Ignorable="d"
         Title="RomSync" Height="450"
         DataContext="{Binding RelativeSource={RelativeSource Self}}"
+        Closing="Window_Closing"
         Width="575.524"
         Icon="Resources/programicon.png">
     
@@ -49,31 +50,8 @@
                   MouseLeftButtonUp="InputRomsListView_MouseLeftButtonUp"
                   ItemsSource="{Binding InputRoms}"
                   Grid.Column="0"
-                  Grid.Row="1">
-
-            <ListView.ItemTemplate>
-                <DataTemplate>
-                    <StackPanel Orientation="Horizontal">
-                        
-                        <Image Height="20"
-                               Width="20"
-                               Margin="0,0,10,0"
-                               Source="{Binding SyncStatusImage}" />
-
-                        <Image Height="20"
-                               Width="20" 
-                               Margin="0,0,10,0"
-                               Source="{Binding Icon}"/>
-
-                        <Label Content="{Binding FileInfo.Name}" />
-
-                    </StackPanel>
-                    
-                    
-                </DataTemplate>
-            </ListView.ItemTemplate>
-            
-        </ListView>
+                  Grid.Row="1"
+                  ItemTemplate="{StaticResource ResourceKey=RomItemTemplate}" />
 
         <StackPanel Orientation="Horizontal"
                     Grid.Column="2"
@@ -100,32 +78,8 @@
         <ListView Name="OutputRomsListView"
                   ItemsSource="{Binding OutputRoms}"
                   Grid.Column="3"
-                  Grid.Row="1">
-
-            <ListView.ItemTemplate>
-                <DataTemplate>
-                    
-                    <StackPanel Orientation="Horizontal">
-
-                        <Image Height="20"
-                               Width="20"
-                               Margin="0,0,10,0"
-                               Source="{Binding SyncStatusImage}" />
-
-                        <Image Height="20"
-                               Width="20"
-                               Margin="0,0,10,0"
-                               Source="{Binding Icon}" />
-
-                        <Label Content="{Binding FileInfo.Name}" />
-
-                    </StackPanel>
-
-
-                </DataTemplate>
-            </ListView.ItemTemplate>
-
-        </ListView>
+                  Grid.Row="1"
+                  ItemTemplate="{StaticResource ResourceKey=RomItemTemplate}" />
 
         <Button Name="SyncSelectedButton"
                 Content="Sync Selected"
